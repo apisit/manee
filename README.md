@@ -1,7 +1,7 @@
 # Manee
 This little Go program helps generating CRUD operations from your Go's struct.  
 Manee uses Go standard package: AST to read your struct code and struct field tags.  
-**I use PostgreSQL so this was tested only on PostgreSQL.**  
+**I use PostgreSQL so this was tested only with PostgreSQL.**  
 **Go struct file must be valid and compilable**  
 
 
@@ -204,4 +204,5 @@ func (d *MockPersonRepository) DeletePerson(p *models.Person) (*models.Person, e
 
 ## TODO
 * Finished mock repository. Going to generate sample data.
+* Generate controller and front end perhaps.
 
