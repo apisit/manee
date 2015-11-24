@@ -31,7 +31,7 @@ type Person struct {
 
 
 ## Run
-> go build
+> go build  
 > ./manee -f=yourStructFile.go
 
 ## Result
