@@ -1,7 +1,9 @@
 # Manee
-This little Go program helps generating CRUD operations from your Go's struct.
-Manee uses Go standard package: AST to read your struct code and struct field tags.
-_Go struct file must be valid and compilable_
+This little Go program helps generating CRUD operations from your Go's struct.  
+Manee uses Go standard package: AST to read your struct code and struct field tags.  
+**I use PostgreSQL so this was tested only on PostgreSQL**
+**Go struct file must be valid and compilable**
+
 
 ## Usage
 Use **// table:"table_name"** to define your table name.  
@@ -33,13 +35,13 @@ type Person struct {
 ## Result
 Manee will create a new directory where your struct file is located.  
 Directory contains 3 files.  
-_structName_mock_manee.go  
-_structName_repository_manee.go  
-_structName_service_manee.go  
+*struct_name*_mock_manee.go  
+*struct_name*_repository_manee.go  
+*struct_name*_service_manee.go  
 
 Manee uses repository and dependency injection pattern.  
 
-Open _structName_service_manee.go and you will see  
+Open *struct_name*_service_manee.go and you will see  
 
 ```go
     //m := &PersonRepository{DB: nil}
