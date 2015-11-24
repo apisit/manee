@@ -1,8 +1,8 @@
 # Manee
 This little Go program helps generating CRUD operations from your Go's struct.  
 Manee uses Go standard package: AST to read your struct code and struct field tags.  
-**I use PostgreSQL so this was tested only on PostgreSQL**
-**Go struct file must be valid and compilable**
+**I use PostgreSQL so this was tested only on PostgreSQL.**  
+**Go struct file must be valid and compilable**  
 
 
 ## Usage
@@ -29,8 +29,10 @@ type Person struct {
 }
 ```
 
+
 ## Run
-./manee -f=yourStructFile.go
+> go build
+> ./manee -f=yourStructFile.go
 
 ## Result
 Manee will create a new directory where your struct file is located.  
