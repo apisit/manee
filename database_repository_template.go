@@ -68,14 +68,15 @@ func (s *Struct) SelectSingleStatement() string {
 func (s *Struct) InsertTemplate() string {
 	buf := bytes.Buffer{}
 	template := newTemplate(`
-func (d *{{.Name}}Repository) Insert{{.Name}}({{.ObjectName}} *{{.Namespace}}) (*{{.Namespace}}, error) {
+func (d *{{.Name}}Repository) Insert{{.Name}}({{.ObjectName}} {{.Namespace}}) ({{.Namespace}}, error) {
 	stmt, err := d.DB.Prepare(` + "`" + `{{.InsertStatement}}` + "`)" + `
 	if err != nil {
-		return nil, err
+		return {{.ObjectName}}, err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow({{.CommaSeparatedQueryRow}}).Scan({{.CommaSeparatedScans}})
 	if err != nil {
-		return nil, err
+		return {{.ObjectName}}, err
 	}
 	return {{.ObjectName}}, nil
 }`)
@@ -86,14 +87,15 @@ func (d *{{.Name}}Repository) Insert{{.Name}}({{.ObjectName}} *{{.Namespace}}) (
 func (s *Struct) UpdateTemplate() string {
 	buf := bytes.Buffer{}
 	template := newTemplate(`
-func (d *{{.Name}}Repository) Update{{.Name}}({{.ObjectName}} *{{.Namespace}}) (*{{.Namespace}}, error) {
+func (d *{{.Name}}Repository) Update{{.Name}}({{.ObjectName}} {{.Namespace}}) ({{.Namespace}}, error) {
 	stmt, err := d.DB.Prepare(` + "`" + `{{.UpdateStatement}}` + "`)" + `
 	if err != nil {
-		return nil, err
+		return {{.ObjectName}}, err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow({{.CommaSeparatedQueryRow}}).Scan({{.CommaSeparatedScans}})
 	if err != nil {
-		return nil, err
+		return {{.ObjectName}}, err
 	}
 	return {{.ObjectName}}, nil
 }`)
@@ -104,11 +106,12 @@ func (d *{{.Name}}Repository) Update{{.Name}}({{.ObjectName}} *{{.Namespace}}) (
 func (s *Struct) DeleteTemplate() string {
 	buf := bytes.Buffer{}
 	template := newTemplate(`
-func (d *{{.Name}}Repository) Delete{{.Name}}({{.ObjectName}} *{{.Namespace}}) (*{{.Namespace}}, error) {
+func (d *{{.Name}}Repository) Delete{{.Name}}({{.ObjectName}} {{.Namespace}}) ({{.Namespace}}, error) {
 	stmt, err := d.DB.Prepare(` + "`" + `{{.DeleteStatement}}` + "`)" + `
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 	err = stmt.QueryRow({{.CommaSeparatedQueryRowPrimaryKey}}).Scan({{.CommaSeparatedScans}})
 	if err != nil {
 		return nil, err
@@ -122,17 +125,18 @@ func (d *{{.Name}}Repository) Delete{{.Name}}({{.ObjectName}} *{{.Namespace}}) (
 func (s *Struct) SelectTemplate() string {
 	buf := bytes.Buffer{}
 	template := newTemplate(`
-func (d *{{.Name}}Repository) Get{{.Name}}({{.PrimaryKeyField.Name}} {{.PrimaryKeyField.Type}}) (*{{.Namespace}}, error) {
+func (d *{{.Name}}Repository) Get{{.Name}}({{.PrimaryKeyField.Name}} {{.PrimaryKeyField.Type}}) ({{.Namespace}}, error) {
+	{{.ObjectName}} := {{.Namespace}}{}
 	stmt, err := d.DB.Prepare(` + "`" + `{{.SelectSingleStatement}}` + "`)" + `
 	if err != nil {
-		return nil, err
+		return {{.ObjectName}}, err
 	}
-	{{.ObjectName}} := {{.Namespace}}{}
+	defer stmt.Close()
 	err = stmt.QueryRow({{.PrimaryKeyField.Name}}).Scan({{.CommaSeparatedScans}})
 	if err != nil {
-		return nil, err
+		return {{.ObjectName}}, err
 	}
-	return &{{.ObjectName}}, nil
+	return {{.ObjectName}}, nil
 }`)
 	template.Execute(&buf, s)
 	return buf.String()
@@ -141,27 +145,27 @@ func (d *{{.Name}}Repository) Get{{.Name}}({{.PrimaryKeyField.Name}} {{.PrimaryK
 func (s *Struct) SelectAllTemplate() string {
 	buf := bytes.Buffer{}
 	template := newTemplate(`
-func (d *{{.Name}}Repository) GetAll{{.Name}}() (*[]{{.Namespace}}, error) {
+func (d *{{.Name}}Repository) GetAll{{.Name}}() ([]{{.Namespace}}, error) {
+	list := []{{.Namespace}}{}
 	stmt, err := d.DB.Prepare(` + "`" + `{{.SelectStatement}}` + "`)" + `
 	if err != nil {
-		return nil, err
+		return list, err
 	}
 	defer stmt.Close()
 	rows, err := stmt.Query()
 	if err != nil {
-		return nil, err
+		return list, err
 	}
 	defer rows.Close()
-	list := []{{.Namespace}}{}
 	for rows.Next() {
 		{{.ObjectName}} := {{.Namespace}}{}
 		errScan := rows.Scan({{.CommaSeparatedScans}})
 		if errScan != nil {
-			return nil, err
+			return list, err
 		}
 		list = append(list, {{.ObjectName}})
 	}
-	return &list, nil
+	return list, nil
 }`)
 	template.Execute(&buf, s)
 	return buf.String()

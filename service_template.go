@@ -12,10 +12,10 @@ package {{.NameLowercase}}
 import "{{.ImportPath}}"
 
 type {{.Name}}Service struct {
-	{{.Name}}ServiceManager
+	{{.Name}}ServiceInterface
 }
 
-type {{.Name}}ServiceManager interface {
+type {{.Name}}ServiceInterface interface {
 	{{.SelectAllMethodSignature}}
 	{{.SelectSingleMethodSignature}}
 	{{.InsertMethodSignature}}
@@ -26,7 +26,7 @@ type {{.Name}}ServiceManager interface {
 func New{{.Name}}Service() *{{.Name}}Service {
 	//m := &{{.Name}}Repository{DB: nil}
 	m := &Mock{{.Name}}Repository{}
-	return &{{.Name}}Service{ {{.Name}}ServiceManager: m }
+	return &{{.Name}}Service{ {{.Name}}ServiceInterface: m }
 }`)
 	template.Execute(&buf, s)
 	return buf.String()
